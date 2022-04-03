@@ -73,8 +73,8 @@ def transform_data(**kwargs):
     ti.xcom_push(key='api_df', value=res_df)
 
 
-with DAG('airflow_YP', description='load_rates_from_api', schedule_interval='0 */3 * * *', catchup=False,
-         default_args=args) as dag:
+with DAG('airflow_YP', description='load_rates_from_api', schedule_interval='*/1 * * * *', catchup=False,
+         default_args=args) as dag: #0 */3 * * *
     extract_data = PythonOperator(task_id='extract_data', python_callable=extract_data)
     transform_data = PythonOperator(task_id='transform_data', python_callable=transform_data)
     create_table = PostgresOperator(
