@@ -26,14 +26,14 @@ args = {
 
 def extract_data(**kwargs):
     ti = kwargs['ti']
-    if templates["historical"]["active"] == 0:
+    if templates["historical"]["active"] == 0: # не подгружаем исторические данные
         url = 'https://api.exchangerate.host/convert?'
         query_params = {
             "from": templates["from"],
             "to": templates["to"]
         }
         response = requests.get(url, query_params)
-    elif templates["historical"]["active"] == 1:
+    elif templates["historical"]["active"] == 1: # подгружаем исторические данные
         url = f'https://api.exchangerate.host/timeseries?' \
               f'start_date={templates["historical"]["dt_from"]}&' \
               f'end_date={templates["historical"]["dt_to"]}'
@@ -54,13 +54,13 @@ def transform_data(**kwargs):
     json_data = ti.xcom_pull(key='api_json',
                              task_ids=['extract_data'])[0]
     # Normalizing data
-    if templates["historical"]["active"] == 0:
+    if templates["historical"]["active"] == 0: # В случае, если исторические данные не подгружаются
         FIELDS = ["query_from",
                   "query_to",
                   "info_rate",
                   "date"]
         res_df = json_normalize(json_data, sep="_")[FIELDS]
-    elif templates["historical"]["active"] == 1:
+    elif templates["historical"]["active"] == 1:  # В случае, если подгружены исторические данные
         res_df = pd.DataFrame.from_dict(json_data['rates'], orient="index")
         res_df['query_from'] = 'BTC'
         res_df['query_to'] = 'USD'
@@ -90,9 +90,9 @@ with DAG('airflow_YP', description='load_rates_from_api', schedule_interval='0 *
                                 );
                             """
     )
-    if templates["historical"]["active"] == 0:
-        k=1
-    elif templates["historical"]["active"] == 1:
+    if templates["historical"]["active"] == 0: # В случае, если исторические данные не подгружаются
+        k=1 # число строк в загружаемой таблице
+    elif templates["historical"]["active"] == 1: # В случае, если подгружены исторические данные
         dt_to = templates["historical"]["dt_to"]
         dt_from = templates["historical"]["dt_from"]
         dt_to = dt_to.split('-')
@@ -100,7 +100,7 @@ with DAG('airflow_YP', description='load_rates_from_api', schedule_interval='0 *
         dt_to_dttm = datetime.date(int(dt_to[0]), int(dt_to[1]), int(dt_to[2]))
         dt_from_dttm = datetime.date(int(dt_from[0]), int(dt_from[1]), int(dt_from[2]))
         days = (dt_to_dttm - dt_from_dttm).days
-        k = days
+        k = days # число строк в загружаемой таблице
     insert_in_table = PostgresOperator(
         task_id="insert_table",
         postgres_conn_id="database_PG",
