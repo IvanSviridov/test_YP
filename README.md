@@ -1,6 +1,6 @@
 # test_YP
 1) git clone https://github.com/IvanSviridov/test_YP.git  
-Открываем проект. Далее в  терминале.  
+Открываем проект. Далее в  терминале (команды указывал для windows).  
 2) Смотрим есть ли запущенные контейнеры: docker ps  
 3) По необходимости останавливаем их: FOR /f "tokens=*" %i IN ('docker ps -q') DO docker stop %i  
 4) Запускаем docker-airflow: docker-compose -f docker-compose-CeleryExecutor.yml up -d  
