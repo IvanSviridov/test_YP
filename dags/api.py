@@ -9,15 +9,15 @@ import json
 
 
 templates= {
-  "from": "BTC",
-  "to": "USD",
-  "date": "currency",
+  "from": "BTC", # базовая валюта
+  "to": "USD",  # Минорная валюта
   "historical": {
-    "active": 0,
-    "dt_from": '2020-01-01',
-    "dt_to" : '2020-01-04'
+    "active": 0, # Подгружаем ли исторические данные? 0 - нет, 1 - да
+    "dt_from": '2020-01-01', # Начало интервала для исторических данных
+    "dt_to" : '2020-01-04' # Конец интервала для исторических данных
   }
 }
+
 args = {
     'owner': 'user',
     'start_date': datetime.datetime(2021, 11, 1),
@@ -74,7 +74,7 @@ def transform_data(**kwargs):
 
 
 with DAG('airflow_YP', description='load_rates_from_api', schedule_interval='0 */3 * * *', catchup=False,
-         default_args=args) as dag: #0 */3 * * *
+         default_args=args) as dag: #*/1 * * * *
     extract_data = PythonOperator(task_id='extract_data', python_callable=extract_data)
     transform_data = PythonOperator(task_id='transform_data', python_callable=transform_data)
     create_table = PostgresOperator(
