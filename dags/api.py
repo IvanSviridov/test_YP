@@ -48,7 +48,6 @@ def extract_data(**kwargs):
         print('Response Failed')
     ti.xcom_push(key='api_json', value=json_data)
 
-
 def transform_data(**kwargs):
     ti = kwargs['ti']
     json_data = ti.xcom_pull(key='api_json',
